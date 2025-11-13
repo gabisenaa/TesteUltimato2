@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RADIORUM — Upload</title>
+  <style>
+    :root{
+      --yellow: #FFD700;
+      --black: #000000;
+      --gray: #E0E0E0;
+    }
+    body{ font-family: Arial, sans-serif; margin:0; background:var(--gray); color:var(--black); }
+    header{ background:var(--black); color:var(--yellow); padding:1rem 2rem; display:flex; align-items:center; gap:1rem; }
+    h1{ margin:0; font-size:1.4rem; letter-spacing:2px; }
+    main{ padding:2rem; }
+    .card{ background:white; padding:1rem; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
+    .box{ border: 2px dashed #ccc; padding:1rem; border-radius:6px; background:#fafafa; }
+    .cases{ margin-top:1rem; }
+    a.case{ display:inline-block; margin:0.25rem; padding:0.5rem 0.75rem; background:var(--black); color:var(--yellow); text-decoration:none; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="width:48px;height:48px;border-radius:6px;background:var(--yellow);display:flex;align-items:center;justify-content:center;color:var(--black);font-weight:700">R</div>
+    <h1>RADIORUM</h1>
+  </header>
+  <main>
+    <div class="card">
+      <h2>Upload DICOM series</h2>
+      <p>Envie um arquivo .zip contendo uma série DICOM (CT/MR) ou selecione múltiplos arquivos DICOM.</p>
+      <form method="post" action="/upload" enctype="multipart/form-data">
+        <div class="box">
+          <label>Upload zip file: <input type="file" name="zipfile" accept=".zip"></label>
+        </div>
+        <p style="text-align:center">ou</p>
+        <div class="box">
+          <label>Select multiple DICOM files: <input type="file" name="files" multiple></label>
+        </div>
+        <p><button type="submit" style="background:var(--black);color:var(--yellow);border:none;padding:0.6rem 1rem;border-radius:6px;cursor:pointer">Upload & Process</button></p>
+      </form>
+    </div>
+
+    <div class="card cases">
+      <h3>Cases existentes</h3>
+      <div id="casesList">Carregando...</div>
+    </div>
+  </main>
+
+  <script>
+    async function loadCases(){
+      const r = await fetch('/cases');
+      const j = await r.json();
+      const div = document.getElementById('casesList');
+      div.innerHTML = '';
+      if(!j.cases || j.cases.length===0){ div.innerText = 'Nenhum caso. Faça um upload.'; return;}
+      j.cases.forEach(c=>{
+        const a = document.createElement('a');
+        a.className='case';
+        a.href='/viewer/'+c;
+        a.innerText = c.slice(0,8);
+        div.appendChild(a);
+      });
+    }
+    loadCases();
+  </script>
+</body>
+</html>
